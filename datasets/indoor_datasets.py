@@ -155,13 +155,9 @@ class R2RImageDataset(base_dataset.BaseDataset):
             tf.io.FixedLenFeature([], dtype=tf.float32, default_value=10.0),
         "image/encoded":
             tf.io.FixedLenFeature([], dtype=tf.string, default_value=""),
-        "image/perspective_encoded":
-            tf.io.FixedLenFeature([], dtype=tf.string, default_value=""),
         "image/filename":
             tf.io.FixedLenFeature([], dtype=tf.string, default_value=""),
         "image/depth":
-            tf.io.FixedLenFeature([], dtype=tf.string, default_value=""),
-        "image/perspective_depth":
             tf.io.FixedLenFeature([], dtype=tf.string, default_value=""),
         "image/visible_mask":
             tf.io.FixedLenFeature([], dtype=tf.string, default_value=""),

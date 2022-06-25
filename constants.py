@@ -15,8 +15,8 @@
 """Constants."""
 
 # TODO: Change to your local checkpoint path.
-CKPT_UNSEEN = 'data/ckpt/se3ds_ckpt'
-CKPT_RE10K = 'data/ckpt/se3ds_re10k_ckpt'
+CKPT_UNSEEN = 'data/se3ds_ckpt'
+CKPT_RE10K = 'data/se3ds_re10k_ckpt'
 
 INVALID_SEM_VALUE = 0  # Corresponds to MP3D void class.
 INVALID_RGB_VALUE = -1  # Negative value to avoid collision with black pixels.
