@@ -20,6 +20,7 @@ import numpy as np
 from se3ds import constants
 from se3ds.models import image_models
 from se3ds.utils import pano_utils
+from se3ds.utils import utils
 import tensorflow as tf
 
 
@@ -95,10 +96,11 @@ class SE3DSModel(object):
     if config.batch_size != 1:
       raise ValueError('Several methods do not support batch_size > 1.')
     self.model = image_models.ResNetGenerator(
-        resnet_version=config.resnet_version, gen_dims=config.gen_dims)
+        resnet_version=config.resnet_version, gen_dims=config.gen_dims,
+        use_blurred_mask=config.use_blurred_mask)
     if config.ckpt_path is not None:
       ckpt = tf.train.Checkpoint(ema_generator=self.model)
-      status = ckpt.restore(config.ckpt_path)
+      status = ckpt.restore(utils.get_local_ckpt_path(config.ckpt_path))
       status.assert_existing_objects_matched()
       print('Restored from', config.ckpt_path)
     else:

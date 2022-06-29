@@ -339,3 +339,138 @@ def rotate_pano(pano: tf.Tensor,
   rotated_pano = tfa_image.interpolate_bilinear(pano, image_coordinates)
   rotated_pano = tf.reshape(rotated_pano, output_shape)
   return rotated_pano
+
+
+def project_perspective_image(image,
+                              fov,
+                              output_height,
+                              camera_intrinsics=None,
+                              rotations=None,
+                              rotation_matrix=None,
+                              pad_mode='constant',
+                              pad_value=0.0,
+                              round_to_nearest=False):
+  """Converts a perspective to an equirectangular image.
+
+  Modified from //experimental/earthsea/wanderer/geometry_utils.py.
+
+  Args:
+    image: Tensor with shape [height, width, channels].
+    fov: tensor with the fields of view of the image (vertical, horizontal) in
+      radians.
+    output_height: Int height of the output image, the width will be double.
+    camera_intrinsics: Optional camera intrinsics matrix to use instead of
+      computing it using field of view.
+    rotations: optional tensor containing pitch and heading in radians for
+      rotating camera. A positive pitch rotates the camera upwards. A positive
+      heading rotates the camera along the equator clockwise.
+    rotation_matrix: Optional 3x3 rotation matrix to use instead as an
+      alternative to the rotations parameter.
+    pad_mode: Padding mode, one of {`reflect`, `mean`, `constant`}.
+    pad_value: value to use if pad_mode is set to constant.
+    round_to_nearest: if set to True, coordinates are rounded to integers before
+      interpolation. This can be useful, for instance, for labels in semantic
+      segmentation.
+
+  Returns:
+    output_image: an [output_height, output_height * 2, channels] tensor
+      containing the output image.
+  """
+  assert pad_mode in {'reflect', 'constant',
+                      'mean'}, ('Unsupported pad mode: %s' % pad_mode)
+  image = tf.expand_dims(image, 0)
+  output_width = 2 * output_height
+
+  # Get world coordinates of the points of interest.
+  # Longitude range is determined by the longitude of the image corners.
+  world_coordinates = equirectangular_pixel_rays(output_height)
+
+  # Convert world to image coordinates.
+  image_shape = tf.cast(tf.shape(image), tf.float32)
+  world_to_image = get_world_to_image_transform(
+      (image_shape[1], image_shape[2]), fov,
+      camera_intrinsics=camera_intrinsics, rotations=rotations,
+      rotation_matrix=rotation_matrix)
+  image_coordinates = world_to_image @ world_coordinates
+  image_coordinates = tf.transpose(image_coordinates)
+  xs_and_ys = image_coordinates[:, :2]
+  zs = image_coordinates[:, 2:]
+  image_coordinates = tf.where(
+      tf.broadcast_to(zs > 0, [output_height * output_width, 2]),
+      xs_and_ys / zs, -1 * tf.ones_like(xs_and_ys))
+  if round_to_nearest:
+    image_coordinates = tf.math.round(image_coordinates)
+
+  # Interpolate.
+  if pad_mode != 'reflect':
+    constant_values = tf.reduce_mean(image) if pad_mode == 'mean' else pad_value
+    image = tf.pad(
+        image, ((0, 0), (1, 1), (1, 1), (0, 0)),
+        mode='constant',
+        constant_values=constant_values)
+    image_coordinates = image_coordinates + 1.  # Account for padding.
+  output_image = tfa_image.interpolate_bilinear(
+      image, tf.expand_dims(image_coordinates, 0), indexing='xy')
+  output_image = tf.reshape(output_image, [output_height, output_width, -1])
+  num_channels = image.shape[-1]
+  output_image = tf.ensure_shape(output_image, [None, None, num_channels])
+  return output_image
+
+
+def _xyz_to_lonlat(xyz):
+  """Converts the world coordinates into longitude, latitudes."""
+  norm = tf.linalg.norm(xyz, axis=-1, keepdims=True)
+  xyz_norm = xyz / norm
+  x = xyz_norm[..., 0:1]
+  y = xyz_norm[..., 1:2]
+  z = xyz_norm[..., 2:]
+
+  lon = tf.math.atan2(x, z)
+  lat = tf.math.asin(y)
+  lst = [lon, lat]
+
+  out = tf.concat(lst, axis=-1)
+  return out
+
+
+def _lonlat_to_uv(lonlat, shape):
+  """Converts the longitude/latitudes to image coords with a given shape."""
+  u = (lonlat[..., 0:1] / (2 * np.pi) + 0.5) * (shape[1] - 1)
+  v = (lonlat[..., 1:] / (np.pi) + 0.5) * (shape[0] - 1)
+  return tf.concat([u, v], axis=-1)
+
+
+def get_perspective_from_equirectangular_image(image, camera_intrinsics,
+                                               rotation_matrix, height, width):
+  """Converts the equirectangular image to perspective image.
+
+  Args:
+    image: Equirectangular image of shape (H, W, 3)
+    camera_intrinsics: camera intrinsic matrix of perspective camera
+    rotation_matrix: rotation matrix associated with camera
+    height: height of the perspective image
+    width: width of the perspective image
+  Returns:
+    perspective_image: returns the perspective image
+  """
+  eq_height, eq_width, channels = image.shape
+
+  x = tf.range(width)
+  y = tf.range(height)
+  x, y = tf.meshgrid(x, y)
+  z = tf.ones_like(x)
+  xyz = tf.concat([x[..., None], y[..., None], z[..., None]], axis=-1)
+  xyz = tf.cast(xyz, tf.float32)
+  xyz = (xyz @ tf.transpose(tf.linalg.inv(camera_intrinsics))) @ rotation_matrix
+
+  lonlat = _xyz_to_lonlat(xyz)
+  uv = _lonlat_to_uv(lonlat, shape=(eq_height, eq_width))
+  uv = tf.cast(uv, tf.float32)
+  uv = tf.reshape(uv, (-1, 2))
+
+  image = tf.cast(tf.expand_dims(image, 0), tf.float32)
+  perspective_image = tfa_image.interpolate_bilinear(
+      image, tf.expand_dims(uv, 0), indexing='xy')
+  perspective_image = tf.reshape(perspective_image, [height, width, channels])
+
+  return perspective_image

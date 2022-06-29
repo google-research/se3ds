@@ -1,0 +1,46 @@
+GANManager.generator_fn  = @image_models.ResNetGenerator
+GANManager.discriminator_fn = @image_models.SNMultiScaleDiscriminator
+GANManager.log_every_steps = 100
+GANManager.save_every_steps = 2000
+GANManager.eval_every_steps = 4000
+GANManager.train_batch_size = 128
+GANManager.test_batch_size = 64
+GANManager.parallel_calls = 16
+GANManager.shuffle_buffer_size = 256
+GANManager.beta1 = 0.5
+GANManager.g_lr = 0.0001
+GANManager.d_lr = 0.0004
+GANManager.d_step_per_g_step = 2
+GANManager.num_batched_steps = 100
+GANManager.show_num = 25
+GANManager.num_epochs = 500
+GANManager.seed = 0
+# Use predictions during eval.
+se3ds_trainer.GAN.mask_blurred = True
+se3ds_trainer.GAN.lambda_kld = 10.0
+se3ds_trainer.GAN.lambda_gan = 1.0
+se3ds_trainer.GAN.lambda_depth = 100.0
+se3ds_trainer.GAN.lambda_wc = 10.0
+se3ds_trainer.GAN.dis_use_pred_depth = True
+se3ds_trainer.GAN.predict_depth = True
+inception_utils.inception_model.version = "V3"
+
+image_models.ResNetDecoder.partial_conv = True
+image_models.ResNetGenerator.gen_dims = 128
+image_models.ResNetGenerator.resnet_version = "101"
+image_models.SNMultiScaleDiscriminator.dis_dims = 128
+image_models.SNMultiScaleDiscriminator.n_dis = 2
+image_models.SNMultiScaleDiscriminator.n_layers = 6
+R2RImageDataset.random_resize_max = 2.0
+
+# Dataset
+R2RImageDataset.preprocessed_image_height = 1024
+R2RVideoDataset.preprocessed_image_height = 1024
+GANManager.image_size = 128
+R2RImageDataset.image_size = 128
+R2RVideoDataset.image_size = 128
+
+# TODO: Change to folder containing TFRecords.
+R2RImageDataset.data_dir = 'data/train/'
+R2RVideoDataset.data_dir = 'data/val/'
+

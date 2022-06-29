@@ -32,6 +32,7 @@ class SE3DSConfig:
   image_height: int = 512
   h_fov: float = 0.17
   resnet_version: str = '101'
+  use_blurred_mask: bool = True
 
 
 def get_config() -> SE3DSConfig:
@@ -47,6 +48,7 @@ def get_re10k_config() -> SE3DSConfig:
   config = SE3DSConfig()
   config.ckpt_path = constants.CKPT_RE10K
   config.resnet_version = '101'
+  config.use_blurred_mask = False
   return config
 
 

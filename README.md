@@ -22,11 +22,48 @@ export PYTHONPATH=$PYTHONPATH:/home/path/to/se3ds_root/
 
 ### Downloading Pretrained Checkpoints
 
-Coming soon!
+We provide the pretrained checkpoint (trained on Matterport3D) used in our paper for reporting generation and VLN results. The checkpoint can be downloaded by running:
+```
+wget https://storage.googleapis.com/gresearch/se3ds/mp3d_ckpt.tar -P data/
+tar -xf data/mp3d_ckpt.tar --directory data/
+```
 
-## Colab Demo
+The results will be extracted to the `data/` directory. The checkpoint is quite large (17GB), so make sure there is sufficient disk space.
 
-Coming soon!
+
+
+## Colab Inference Demo
+
+`notebooks/SE3DS_MP3D_Example_Colab.ipynb` [[click to launch in Google Colab]]() shows how to setup and run the pretrained SE3DS model for inference. It includes examples on synthesizing image sequences and continuous video sequences for arbitrary navigation trajectories in Matterport3D.
+
+## VLN Perturbation Augmentation
+
+`notebooks/SE3DS_VLN_Augmentation_Colab.ipynb` [[click to launch in Google Colab]]() shows how to run the pretrained SE3DS model for the VLN augmentation experiment we have in the paper. In our experiments, this improves the success rate of an already strong VLN agent by up to 1.5%.
+
+
+## Training a New Model
+
+We provide example training and testing scripts (`train.sh` and `test.sh`). After preprocessing data in the expected TFRecords format (see `datasets/indoor_datasets.py` and `datasets/indoor_datasets_test.py`), update the gin config files to specify the location of the tfrecords for train (`R2RImageDataset.data_dir`) and eval (`R2RVideoDataset.data_dir`).
+
+### Training
+
+Start a training run, by first editing train.sh to specify an appropriate work directory. By default, the script uses all GPUs available, and distributes data across all available GPUs. After configuring the training job, start an experiment by running it on bash:
+
+```
+mkdir exp
+bash train.sh exp_name &> train.txt
+```
+
+### Evaluation
+
+To run an evaluation job, update test.sh with the correct settings used in the training script. Then, execute
+
+```
+bash test.sh exp_name &> eval.txt
+```
+
+to start an evaluation job. All checkpoints in the work directory will be evaluated for FID and Inception Score. If you can spare the GPUs, you can also run train.sh and test.sh in parallel, which will continuously evaluate new checkpoints saved into the work directory. Scores will be written to Tensorboard and output to eval.txt.
+
 
 ## Citation
 

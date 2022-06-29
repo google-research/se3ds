@@ -13,7 +13,6 @@ GANManager.d_lr = 0.0004
 GANManager.d_step_per_g_step = 2
 GANManager.num_batched_steps = 100
 GANManager.show_num = 25
-GANManager.image_size = 256
 GANManager.num_epochs = 500
 GANManager.seed = 0
 # Use predictions during eval.
@@ -27,14 +26,19 @@ se3ds_trainer.GAN.predict_depth = True
 inception_utils.inception_model.version = "V3"
 
 image_models.ResNetDecoder.partial_conv = True
-
 image_models.ResNetGenerator.gen_dims = 128
+image_models.ResNetGenerator.resnet_version = "101"
 image_models.SNMultiScaleDiscriminator.dis_dims = 128
+image_models.SNMultiScaleDiscriminator.n_dis = 2
+image_models.SNMultiScaleDiscriminator.n_layers = 6
 R2RImageDataset.random_resize_max = 2.0
 
 # Dataset
 R2RImageDataset.preprocessed_image_height = 1024
 R2RVideoDataset.preprocessed_image_height = 1024
+GANManager.image_size = 512
+R2RImageDataset.image_size = 512
+R2RVideoDataset.image_size = 512
 
 # TODO: Change to folder containing TFRecords.
 R2RImageDataset.data_dir = 'data/train/'

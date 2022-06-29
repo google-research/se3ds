@@ -34,7 +34,8 @@ class ResNetGenerator(tf.keras.Model):
                z_dim: int = 128,
                resnet_version: str = '50',
                context_layer: str = 'convs',
-               conv_mode: str = 'spectral'):
+               conv_mode: str = 'spectral',
+               use_blurred_mask: bool = True):
     """Initializes a ResNet generator."""
     super().__init__()
     self.hidden_dims = gen_dims
@@ -44,6 +45,7 @@ class ResNetGenerator(tf.keras.Model):
     if context_layer not in ['convs', 'none']:
       raise NotImplementedError
     self.context_layer = context_layer
+    self.use_blurred_mask = use_blurred_mask
 
     conv_fn = tf.keras.layers.Conv2D
     if conv_mode == 'spectral':
@@ -144,14 +146,20 @@ class ResNetGenerator(tf.keras.Model):
       out_x: Tensor of shape (N, H, W, 3) with values in [0, 1] representing a
         generated image.
     """
+    if sample_noise:
+      raise ValueError('This model does not support noise sampling!')
     cond, _ = inputs
     guidance_image = cond['proj_image']
     guidance_depth = cond['proj_depth']
     guidance_mask = cond['proj_mask']
     blurred_mask = cond['blurred_mask']
 
-    combined_input = tf.concat(
-        [guidance_image, guidance_depth, blurred_mask], axis=-1)
+    if self.use_blurred_mask:
+      combined_input = tf.concat(
+          [guidance_image, guidance_depth, blurred_mask], axis=-1)
+    else:
+      combined_input = tf.concat(
+          [guidance_image, guidance_depth], axis=-1)
 
     hidden_spatial, skip = self.encoder(combined_input, guidance_mask,
                                         training=training)
