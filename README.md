@@ -2,7 +2,9 @@
 
 This repository hosts the open source code for [SE3DS](https://arxiv.org/abs/2204.02960).
 
-[Paper](https://arxiv.org/abs/2204.02960) | [Colab Demo (Coming soon!)]()
+[![Video Results](./video_results.gif)]({https://www.youtube.com/watch?v=lhwwlrRfFp0} "Video Results")
+
+[Paper](https://arxiv.org/abs/2204.02960) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]()
 
 
 ## Setup instructions
@@ -34,11 +36,18 @@ The results will be extracted to the `data/` directory. The checkpoint is quite 
 
 ## Colab Inference Demo
 
-`notebooks/SE3DS_MP3D_Example_Colab.ipynb` [[click to launch in Google Colab]]() shows how to setup and run the pretrained SE3DS model for inference. It includes examples on synthesizing image sequences and continuous video sequences for arbitrary navigation trajectories in Matterport3D.
+### Matterport3D
+
+`notebooks/SE3DS_MP3D_Example_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]() shows how to setup and run the pretrained SE3DS model (trained on Matterport3D trajectories) for inference. It includes examples on synthesizing image sequences and continuous video sequences for arbitrary navigation trajectories in Matterport3D.
+
+### RealEstate10K
+
+`notebooks/SE3DS_MP3D_Example_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]() shows how to setup and run the pretrained SE3DS model (trained on RE10K videos) for inference.
+
 
 ## VLN Perturbation Augmentation
 
-`notebooks/SE3DS_VLN_Augmentation_Colab.ipynb` [[click to launch in Google Colab]]() shows how to run the pretrained SE3DS model for the VLN augmentation experiment we have in the paper. In our experiments, this improves the success rate of an already strong VLN agent by up to 1.5%.
+`notebooks/SE3DS_VLN_Augmentation_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]() shows how to run the pretrained SE3DS model for the VLN augmentation experiment we have in the paper. In our experiments, this improves the success rate of an already strong VLN agent by up to 1.5%.
 
 
 ## Training a New Model
