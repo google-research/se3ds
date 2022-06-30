@@ -20,7 +20,6 @@ import numpy as np
 from se3ds import constants
 from se3ds.models import image_models
 from se3ds.utils import pano_utils
-from se3ds.utils import utils
 import tensorflow as tf
 
 
@@ -100,7 +99,7 @@ class SE3DSModel(object):
         use_blurred_mask=config.use_blurred_mask)
     if config.ckpt_path is not None:
       ckpt = tf.train.Checkpoint(ema_generator=self.model)
-      status = ckpt.restore(utils.get_local_ckpt_path(config.ckpt_path))
+      status = ckpt.restore(config.ckpt_path)
       status.assert_existing_objects_matched()
       print('Restored from', config.ckpt_path)
     else:
@@ -296,7 +295,6 @@ class SE3DSModel(object):
     dataset_type = tf.zeros((batch_size,), dtype=tf.int32)
 
     assert self.prev_rgb_frame is not None
-    # TODO: Try higher caling factors once modeli s trained.
     scaling_factor = 1.0
     resized_size = (
         int(self.height * scaling_factor), int(self.width * scaling_factor))
