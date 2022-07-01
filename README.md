@@ -4,7 +4,7 @@ This repository hosts the open source code for [SE3DS](https://arxiv.org/abs/220
 
 [![Video Results](./video_results.gif)]({https://www.youtube.com/watch?v=lhwwlrRfFp0} "Video Results")
 
-[Paper](https://arxiv.org/abs/2204.02960) | [Video](https://www.youtube.com/watch?v=lhwwlrRfFp0) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]()
+[Paper](https://arxiv.org/abs/2204.02960) | [Video](https://www.youtube.com/watch?v=lhwwlrRfFp0) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ZccoN8YXFQnm8o3ztVTLHh0Ji9XhZDrn)
 
 
 ## Setup instructions
@@ -32,22 +32,27 @@ tar -xf data/mp3d_ckpt.tar --directory data/
 
 The results will be extracted to the `data/` directory. The checkpoint is quite large (17GB), so make sure there is sufficient disk space.
 
+For the pretrained checkpoint trained on RealEstate10K videos, run the following command:
+```
+wget https://storage.googleapis.com/gresearch/se3ds/re10k_ckpt.tar -P data/
+tar -xf data/re10k_ckpt.tar --directory data/
+```
 
 
 ## Colab Inference Demo
 
 ### Matterport3D
 
-`notebooks/SE3DS_MP3D_Example_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]() shows how to setup and run the pretrained SE3DS model (trained on Matterport3D trajectories) for inference. It includes examples on synthesizing image sequences and continuous video sequences for arbitrary navigation trajectories in Matterport3D.
+`notebooks/SE3DS_MP3D_Example_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ZccoN8YXFQnm8o3ztVTLHh0Ji9XhZDrn) shows how to setup and run the pretrained SE3DS model (trained on Matterport3D trajectories) for inference. It includes examples on synthesizing image sequences and continuous video sequences for arbitrary navigation trajectories in Matterport3D.
 
 ### RealEstate10K
 
-`notebooks/SE3DS_RE10K_Example_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]() shows how to setup and run the pretrained SE3DS model (trained on RE10K videos) for inference.
+`notebooks/SE3DS_RE10K_Example_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1KsOEVYgOKKiNhnR_YPnu0QBco7D2xBjP) shows how to setup and run the pretrained SE3DS model (trained on RE10K videos) for inference.
 
 
 ## VLN Perturbation Augmentation
 
-`notebooks/SE3DS_VLN_Augmentation_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]() shows how to run the pretrained SE3DS model for the VLN augmentation experiment we have in the paper. In our experiments, this improves the success rate of an already strong VLN agent by up to 1.5%.
+`notebooks/SE3DS_VLN_Augmentation_Colab.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1WTBbuMvv9DwgPAq4ZbTa_qb45KrFNDTU) shows how to run the pretrained SE3DS model for the VLN augmentation experiment we have in the paper. In our experiments, this improves the success rate of an already strong VLN agent by up to 1.5%.
 
 
 ## Training a New Model
